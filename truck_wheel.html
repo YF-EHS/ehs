@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>輪胎檢查系統</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --danger-color: #dc3545; 
+            --background-color: #f8f9fa; 
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 10px;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+
+        .tire-entry {
+            padding-top: 4px;
+        }
+
+        .entry-divider {
+            border: none;
+            border-top: 3px dashed #cfd4da;
+            margin: 28px 0;
+        }
+
+        .row {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 20px;
+        }
+
+        .header-row {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .editable-title {
+            font-size: 22px;
+            font-weight: bold;
+            padding: 12px 16px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            background: #fff;
+            min-width: 56px;
+            text-align: center;
+        }
+
+        select, input[type="number"] {
+            padding: 14px 14px !important;
+            border: 2px solid #bbb !important;
+            border-radius: 8px !important;
+            font-size: 20px !important;
+            box-sizing: border-box;
+        }
+
+        .tire-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 20px;
+        }
+
+        .plate-preview {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+
+        .tire-input-wrap input[type="number"] {
+            width: 72px !important;
+            text-align: center;
+        }
+
+        .btn-delete-entry {
+            margin-left: auto;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border: none;
+            border-radius: 8px;
+            background: #fdecea;
+            color: var(--danger-color);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .btn-delete-entry.hidden { display: none; }
+
+        .tread-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 12px;
+            background: #fdfdfd;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #eaeaea;
+        }
+
+        .tread-row span { font-size: 20px; font-weight: bold; }
+
+        .tread-row input[type="number"] {
+            width: 44%;
+            max-width: 140px;
+            text-align: center;
+        }
+
+        .tread-row-5 > div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-remove-tread5 {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border: none;
+            border-radius: 6px;
+            background: #fdecea;
+            color: var(--danger-color);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .btn-add-tread5 {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            background: #fff;
+            color: var(--primary-color);
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .yi-wheel-select {
+            max-width: 100px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            color: #444;
+            width: 100%;
+            font-size: 19px;
+        }
+
+        .image-upload-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .upload-box {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            border: 3px dashed #999;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .upload-box input[type="file"] {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-box-plus {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #666; font-weight: bold;
+        }
+
+        .upload-preview-item {
+            width: 50px; height: 50px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+        }
+
+        .upload-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        .upload-preview-item .btn-del {
+            position: absolute; top: 0; right: 0;
+            background: rgba(220,53,69,0.95);
+            color: white; border: none;
+            font-size: 13px; width: 18px; height: 18px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .btn-add-entry {
+            width: 100%;
+            padding: 16px;
+            margin-top: 6px;
+            margin-bottom: 14px;
+            background: #fff;
+            color: var(--primary-color);
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        #report-view-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 5px 40px;
+            background-color: #555;
+            min-height: 100vh;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .action-bar {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 0 10px;
+        }
+
+        .btn-back, .btn-print-all, .btn-export-html {
+            width: 100%;
+            padding: 15px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-back { background-color: #6c757d; color: #fff; }
+        .btn-print-all { background-color: var(--primary-color); color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .btn-export-html { background-color: #6f42c1; color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+
+        .report-scroll-wrapper {
+            width: 100%;
+            overflow: auto !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .report-card-wrapper {
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-save-single {
+            width: 100%;
+            max-width: 600px;
+            padding: 14px;
+            margin-bottom: 10px;
+            background-color: #ffc107;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+        .btn-save-single:disabled { opacity: 0.7; }
+
+        .report-card {
+            width: 100%;
+            max-width: 460px;
+            background: white;
+            padding: 22px 18px;
+            border-radius: 16px;
+            box-sizing: border-box;
+        }
+
+        .report-title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 18px;
+            color: #111;
+            width: 100%;
+            text-align: center;
+            border-bottom: 3px solid #333;
+            padding-bottom: 14px;
+        }
+
+        /* 上傳照片：並排置中，完整顯示不裁切 */
+        .report-photos-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .report-photos-row img {
+            max-width: 47%;
+            max-height: 230px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+        }
+        .report-photos-empty {
+            color: #aaa;
+            font-size: 16px;
+            padding: 14px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* 輪胎位置示意圖：置中顯示 */
+        .report-diagram-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .report-diagram-wrap img {
+            max-width: 85%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .report-diagram-caption {
+            margin-top: 8px;
+            font-size: 15px;
+            color: #d32f2f;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* 胎紋數據 */
+        .report-tread-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        /* 整組置中顯示，但組內靠左對齊，讓每行的◆符號對齊在同一條線上 */
+        .tread-list {
+            width: fit-content;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .tread-item {
+            margin-bottom: 10px;
+            padding: 14px 16px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 6px solid #007bff;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: left;
+        }
+        .tread-item .val { color: #007bff; font-size: 19px; }
+
+        /* ================= 列印專用樣式 ================= */
+        @media print {
+            @page { size: A4 portrait; margin: 10mm; }
+            body { background-color: #fff !important; padding: 0 !important; margin: 0 !important; }
+            #input-form-section, .action-bar, .btn-save-single { display: none !important; }
+            #report-view-section {
+                background-color: #fff !important;
+                padding: 0 !important;
+                min-height: auto !important;
+                display: block !important;
+            }
+            .report-scroll-wrapper { overflow: visible !important; padding: 0 !important; gap: 0 !important; }
+            .report-card-wrapper {
+                page-break-after: always;
+                break-after: page;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            .report-card-wrapper:last-child { page-break-after: auto; break-after: auto; }
+            .report-card {
+                box-shadow: none !important;
+                margin: 0 auto !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .report-photos-row img { max-width: 45% !important; max-height: 260px !important; }
+            .report-photos-row, .report-diagram-wrap, .tread-item {
+                page-break-inside: avoid; break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="input-form-section" class="container">
+    <div id="entries-container"></div>
+
+    <button type="button" class="btn-add-entry" onclick="addEntry()">[+] 新增一筆輪胎資料</button>
+    <button type="button" class="btn-submit" onclick="generateReport()">送出資料</button>
+    <div style="text-align:center;color:#bbb;font-size:12px;margin-top:14px;">程式版本：2026-07-15-v20</div>
+</div>
+
+<div id="report-view-section">
+    <div class="action-bar">
+        <button type="button" class="btn-back" onclick="backToForm()">[返回] 返回修改</button>
+        <button type="button" class="btn-print-all" onclick="window.print()">[列印] 列印全部（電腦用）</button>
+        <button type="button" class="btn-export-html" onclick="exportStandaloneHtml()">[匯出] 產生HTML網頁檔</button>
+    </div>
+    <div class="report-scroll-wrapper" id="report-container"></div>
+</div>
+
+<script>
+    let entryCounter = 0;
+    let entryImages = {};
+
+    // ---------- imgbb 圖片上傳 ----------
+    const IMGBB_API_KEY = 'd538d7f3d6b952c7a23fd012edc82d7a';
+
+    // 將照片直接上傳到 imgbb，回傳 { thumb, full } 兩種尺寸的網址
+    async function uploadToImgbb(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: 'POST',
+            body: formData
+        });
+        const json = await res.json();
+        if (!json.success) {
+            throw new Error((json.error && json.error.message) || '上傳失敗');
+        }
+        return {
+            thumb: (json.data.thumb && json.data.thumb.url) || json.data.url,
+            full: json.data.url
+        };
+    }
+
+    // ---------- 多筆輪胎資料的動態新增 / 刪除 ----------
+
+    function entryTemplate(id, d) {
+        return `
+        <div class="tire-entry" data-id="${id}">
+            <div class="row header-row">
+                <div class="editable-title" contenteditable="true" oninput="updatePlatePreview(this)">${d.title}</div>
+                <select class="title-select" onchange="onTypeChange(this); updatePlatePreview(this);">
+                    <option value="槽" ${d.type === '槽' ? 'selected' : ''}>槽</option>
+                    <option value="板" ${d.type === '板' ? 'selected' : ''}>板</option>
+                    <option value="櫃" ${d.type === '櫃' ? 'selected' : ''}>櫃</option>
+                    <option value="曳" ${d.type === '曳' ? 'selected' : ''}>曳</option>
+                    <option value="貨" ${d.type === '貨' ? 'selected' : ''}>貨</option>
+                </select>
+                <span class="plate-preview"></span>
+                <select class="yi-wheel-select" style="display:${d.type === '曳' ? 'inline-block' : 'none'};">
+                    <option value="8" ${d.yiWheel === '8' ? 'selected' : ''}>8輪</option>
+                    <option value="6" ${d.yiWheel === '6' ? 'selected' : ''}>6輪</option>
+                </select>
+                <div class="tire-input-wrap">
+                    <span>第</span>
+                    <input type="number" class="tire-number" inputmode="numeric" min="1" value="${d.tireNum}">
+                    <span>輪</span>
+                </div>
+                <button type="button" class="btn-delete-entry" onclick="deleteEntry(${id})" title="刪除本筆">[刪除]</button>
+            </div>
+
+            <div class="row"><div class="section-title">現場照片上傳：</div></div>
+            <div class="image-upload-container" id="upload-container-${id}">
+                <div class="upload-box">
+                    <div class="upload-box-plus">+</div>
+                    <input type="file" accept="image/*" onchange="addNewImage(this, ${id})">
+                </div>
+            </div>
+
+            <div class="row"><div class="section-title">輪胎胎紋由外到內：</div></div>
+            <div class="tread-row"><span>第 1 條胎紋：</span><div><input type="number" class="tread-val" inputmode="decimal" step="0.1"> <span>㎜</span></div></div>
+            <div class="tread-row"><span>第 2 條胎紋：</span><div><input type="number" class="tread-val" inputmode="decimal" step="0.1"> <span>㎜</span></div></div>
+            <div class="tread-row"><span>第 3 條胎紋：</span><div><input type="number" class="tread-val" inputmode="decimal" step="0.1"> <span>㎜</span></div></div>
+            <div class="tread-row"><span>第 4 條胎紋：</span><div><input type="number" class="tread-val" inputmode="decimal" step="0.1"> <span>㎜</span></div></div>
+            <div class="tread-row tread-row-5" style="display:none;"><span>第 5 條胎紋：</span><div><input type="number" class="tread-val" inputmode="decimal" step="0.1"> <span>㎜</span><button type="button" class="btn-remove-tread5" onclick="removeTread5(this)" title="刪除第5條胎紋">×</button></div></div>
+            <button type="button" class="btn-add-tread5" onclick="addTread5(this)">[+] 新增第5條胎紋</button>
+        </div>`;
+    }
+
+    // 選擇「曳」時顯示 6輪／8輪子選單，其他類別則隱藏
+    function onTypeChange(selectEl) {
+        const headerRow = selectEl.closest('.header-row');
+        const yiSelect = headerRow.querySelector('.yi-wheel-select');
+        yiSelect.style.display = (selectEl.value === '曳') ? 'inline-block' : 'none';
+    }
+
+    // 輸入槽/板/櫃號碼或切換類型時，即時顯示對應車牌號碼（getPlateText 定義在下方，執行時已可使用）
+    function updatePlatePreview(el) {
+        const headerRow = el.closest('.header-row');
+        const numberText = headerRow.querySelector('.editable-title').innerText.trim();
+        const typeText = headerRow.querySelector('.title-select').value;
+        const preview = headerRow.querySelector('.plate-preview');
+        const plate = typeof getPlateText !== 'undefined' ? getPlateText(typeText, numberText) : undefined;
+        preview.textContent = plate ? `（${plate}）` : '';
+    }
+
+    // 新增／刪除第5條胎紋輸入列
+    function addTread5(btn) {
+        const entry = btn.closest('.tire-entry');
+        entry.querySelector('.tread-row-5').style.display = 'flex';
+        btn.style.display = 'none';
+    }
+    function removeTread5(delBtn) {
+        const entry = delBtn.closest('.tire-entry');
+        const row5 = entry.querySelector('.tread-row-5');
+        row5.querySelector('.tread-val').value = '';
+        row5.style.display = 'none';
+        entry.querySelector('.btn-add-tread5').style.display = 'block';
+    }
+
+    function addEntry() {
+        const container = document.getElementById('entries-container');
+        const existing = container.querySelectorAll('.tire-entry');
+        let defaults = { title: '', type: '槽', tireNum: '', yiWheel: '8' };
+
+        if (existing.length > 0) {
+            const last = existing[existing.length - 1];
+            defaults.title = last.querySelector('.editable-title').innerText.trim();
+            defaults.type = last.querySelector('.title-select').value;
+            defaults.yiWheel = last.querySelector('.yi-wheel-select').value;
+            const lastNum = parseInt(last.querySelector('.tire-number').value, 10);
+            defaults.tireNum = isNaN(lastNum) ? 1 : lastNum + 1;
+
+            const divider = document.createElement('hr');
+            divider.className = 'entry-divider';
+            container.appendChild(divider);
+        }
+
+        const id = entryCounter++;
+        entryImages[id] = [];
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = entryTemplate(id, defaults);
+        const newEntryEl = wrapper.firstElementChild;
+        container.appendChild(newEntryEl);
+        updatePlatePreview(newEntryEl.querySelector('.editable-title'));
+
+        refreshDeleteButtons();
+    }
+
+    function deleteEntry(id) {
+        const container = document.getElementById('entries-container');
+        const entryEl = container.querySelector(`.tire-entry[data-id="${id}"]`);
+        if (!entryEl) return;
+        if (container.querySelectorAll('.tire-entry').length <= 1) return;
+        if (!confirm('確定要刪除這一筆輪胎檢查資料嗎？')) return;
+
+        const prev = entryEl.previousElementSibling;
+        const next = entryEl.nextElementSibling;
+        if (prev && prev.classList.contains('entry-divider')) prev.remove();
+        else if (next && next.classList.contains('entry-divider')) next.remove();
+
+        delete entryImages[id];
+        entryEl.remove();
+        refreshDeleteButtons();
+    }
+
+    function refreshDeleteButtons() {
+        const entries = document.querySelectorAll('.tire-entry');
+        entries.forEach(entry => {
+            const btn = entry.querySelector('.btn-delete-entry');
+            btn.classList.toggle('hidden', entries.length <= 1);
+        });
+    }
+
+    // ---------- 照片上傳（每一筆各自獨立） ----------
+
+    function addNewImage(input, id) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const uploadBox = input.closest('.upload-box');
+            const plusEl = uploadBox.querySelector('.upload-box-plus');
+            const originalPlus = plusEl.textContent;
+            plusEl.textContent = '…';
+            input.disabled = true;
+
+            uploadToImgbb(file)
+                .then((urls) => {
+                    entryImages[id].push(urls);
+                    renderPreviews(id);
+                })
+                .catch((err) => {
+                    alert('照片上傳失敗，請檢查網路連線後再試一次。\n' + (err && err.message ? err.message : err));
+                })
+                .finally(() => {
+                    plusEl.textContent = originalPlus;
+                    input.disabled = false;
+                    input.value = '';
+                });
+        }
+    }
+
+    function removeImage(id, idx) {
+        entryImages[id].splice(idx, 1);
+        renderPreviews(id);
+    }
+
+    function renderPreviews(id) {
+        const container = document.getElementById(`upload-container-${id}`);
+        container.querySelectorAll('.upload-preview-item').forEach(el => el.remove());
+        entryImages[id].forEach((urls, idx) => {
+            const item = document.createElement('div');
+            item.className = 'upload-preview-item';
+            item.innerHTML = `<img src="${urls.thumb}" loading="lazy"><button type="button" class="btn-del" onclick="removeImage(${id}, ${idx})">×</button>`;
+            container.insertBefore(item, container.firstElementChild);
+        });
+    }
+
+    // 壓縮 Base64 圖片，大幅縮小檔案容量（回傳 Promise 方便多筆資料一起處理）
+    // 特別處理手機照片常見的 EXIF 拍攝方向資訊，避免直式照片被錯誤裁切
+    async function compressImage(base64Str, maxWidth = 800) {
+        try {
+            const res = await fetch(base64Str);
+            const blob = await res.blob();
+            const bitmap = await createImageBitmap(blob, { imageOrientation: 'from-image' });
+
+            let width = bitmap.width, height = bitmap.height;
+            if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bitmap, 0, 0, width, height);
+            return canvas.toDataURL('image/jpeg', 0.85);
+        } catch (err) {
+            // 舊瀏覽器若不支援 createImageBitmap 的方向校正選項，退回原本做法
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.85));
+                };
+                img.src = base64Str;
+            });
+        }
+    }
+
+    function backToForm() {
+        document.getElementById('report-view-section').style.display = 'none';
+        document.getElementById('input-form-section').style.display = 'block';
+        document.body.style.backgroundColor = '#f8f9fa';
+    }
+
+    // ---------- 產生報告（每一筆各自一張獨立卡片，直向堆疊排版，適合手機瀏覽） ----------
+
+    const TIRE_IMG_MAP = {
+        1: "wheel-1/8-1.jpg",
+        2: "wheel-1/8-2.jpg",
+        3: "wheel-1/8-3.jpg",
+        4: "wheel-1/8-4.jpg",
+        5: "wheel-1/8-5.jpg",
+        6: "wheel-1/8-6.jpg",
+        7: "wheel-1/8-7.jpg",
+        8: "wheel-1/8-8.jpg"
+    };
+
+    // 「板」「櫃」改用新的示意圖
+    const FT_IMG_MAP = {
+        1: "wheel-1/ft-1.jpg",
+        2: "wheel-1/ft-2.jpg",
+        3: "wheel-1/ft-3.jpg",
+        4: "wheel-1/ft-4.jpg",
+        5: "wheel-1/ft-5.jpg",
+        6: "wheel-1/ft-6.jpg",
+        7: "wheel-1/ft-7.jpg",
+        8: "wheel-1/ft-8.jpg"
+    };
+
+    // 「板」當中的 3、7、8、11、17 號屬於「鷗」字特殊板台，車牌前要加「鷗-」，示意圖也改用 gw 系列
+    const GULL_BOARD_NUMBERS = ['3', '7', '8', '11', '17'];
+    const GW_IMG_MAP = {
+        1: "wheel-1/gw-1.jpg",
+        2: "wheel-1/gw-2.jpg",
+        3: "wheel-1/gw-3.jpg",
+        4: "wheel-1/gw-4.jpg",
+        5: "wheel-1/gw-5.jpg",
+        6: "wheel-1/gw-6.jpg",
+        7: "wheel-1/gw-7.jpg",
+        8: "wheel-1/gw-8.jpg"
+    };
+    function isGullBoard(selectTypeText, mainTitleText) {
+        return selectTypeText === '板' && GULL_BOARD_NUMBERS.includes(String(mainTitleText).trim());
+    }
+
+    // 「曳」車型另外依 6輪／8輪 對應不同示意圖
+    const YI_IMG_MAP_8 = {
+        1: "wheel-1/truck-8-1.png",
+        2: "wheel-1/truck-8-2.png",
+        3: "wheel-1/truck-8-3.png",
+        4: "wheel-1/truck-8-4.png",
+        5: "wheel-1/truck-8-5.png",
+        6: "wheel-1/truck-8-6.png",
+        7: "wheel-1/truck-8-7.png",
+        8: "wheel-1/truck-8-8.png"
+    };
+    const YI_IMG_MAP_6 = {
+        1: "wheel-1/truck-8-1.png",
+        2: "wheel-1/truck-8-2.png",
+        3: "wheel-1/truck-8-3.png",
+        4: "wheel-1/truck-6-4.png",
+        5: "wheel-1/truck-6-5.png",
+        6: "wheel-1/truck-6-6.png"
+    };
+
+    function getDiagramPath(typeText, yiWheelVal, tireNum, mainTitleText) {
+        if (typeText === '曳') {
+            const table = (yiWheelVal === '6') ? YI_IMG_MAP_6 : YI_IMG_MAP_8;
+            return table[tireNum] || '';
+        }
+        if (typeText === '板' && isGullBoard(typeText, mainTitleText)) {
+            return GW_IMG_MAP[tireNum] || '';
+        }
+        if (typeText === '板' || typeText === '櫃') {
+            return FT_IMG_MAP[tireNum] || '';
+        }
+        return TIRE_IMG_MAP[tireNum] || '';
+    }
+
+    // 槽／板／櫃 編號對應車牌號碼
+    const PLATE_MAP = {
+        '槽': { '1': 'KI-85', '2': 'HBB-9061', '3': 'U5-07', '5': '2Y-53', '6': 'V9-96', '7': 'KI-86', '8': 'OX-49', '9': 'YC-06', '10': 'KP-11', '11': '39-GC', '12': 'NA-05', '13': '91-HN', '15': 'RF-26', '16': '5U-16', '17': 'MP-L9', '18': '96-UB', '19': 'PT-01', '20': 'W9-16', '21': 'H6-15', '22': 'MU-91', '23': 'W6-72', '25': '76-XZ', '26': 'U7-58', '27': '36-YD', '28': '38-YD', '29': 'V9-01', '30': '71-W3', '31': '96-X6', '32': '99-M6', '33': '78-X2', '35': '9V-78', '36': 'YG-32', '37': '5V-03', '38': 'HBB-7307', '39': 'HBB-7311', '50': 'HBB-7803', '51': 'HBB-7822' },
+        '板': { '1': 'J6-95', '2': 'VE-87', '3': 'HBB-8589', '5': 'QF-17', '6': '2Y-11', '7': 'HBB-8611', '8': '41-GU', '10': 'QL-10', '11': 'HBB-7818', '12': 'UU-47', '13': 'MQ-C2', '15': 'QL-69', '16': '61-W5', '17': 'HBB-7819', '18': 'YX-99', '19': '36-UG', '20': 'XR-88', '21': 'Z5-21', '22': 'Z5-22', '23': 'KO-10', '25': '42-W6', '26': '70-V8', '27': '06-F8' },
+        '櫃': { '1': '80-RL', '3': 'R9-42', '5': 'GG-Y1', '6': '15-N7', '7': 'YE-57', '8': '13-ML', '9': 'GG-X6', '10': '28-AH', '11': '31-VM', '12': '52-AH', '13': '13-N7', '15': 'GG-X5', '16': '88-WS', '18': 'U8-89' }
+    };
+
+    // 取得車牌號碼，若屬於「板」的鷗字特殊板台編號，自動在車牌前加上「鷗-」
+    function getPlateText(selectTypeText, mainTitleText) {
+        const plateTable = PLATE_MAP[selectTypeText];
+        const plate = plateTable ? plateTable[mainTitleText] : undefined;
+        if (!plate) return undefined;
+        return isGullBoard(selectTypeText, mainTitleText) ? `鷗-${plate}` : plate;
+    }
+
+    // 組合報告標題文字：若查得到車牌號碼，格式為「1槽（KI-85）第3輪」；
+    // 查不到（例如曳、貨，或槽/板/櫃編號不在清單內）則維持原本「1號槽-第3輪」格式
+    function buildLabel(mainTitleText, selectTypeText, tireNumInput) {
+        const plate = getPlateText(selectTypeText, mainTitleText);
+        if (plate) {
+            return `${mainTitleText}${selectTypeText}（${plate}）第${tireNumInput}輪`;
+        }
+        const needsDash = (selectTypeText === '曳' || selectTypeText === '貨');
+        return `${mainTitleText}號${needsDash ? '-' : ''}${selectTypeText}-第${tireNumInput}輪`;
+    }
+
+    // 專門給「匯出HTML檔名」用的組合方式：查得到車牌就顯示「（車牌）」，查不到就直接省略，不加「號」與「-」
+    // 例：1槽（KI-85）第2輪 / 7139曳第7輪 / 053貨第5輪
+    function buildFileNameLabel(mainTitleText, selectTypeText, tireNumInput) {
+        const plate = getPlateText(selectTypeText, mainTitleText);
+        const platePart = plate ? `（${plate}）` : '';
+        return `${mainTitleText}${selectTypeText}${platePart}第${tireNumInput}輪`;
+    }
+
+    function getDateStr() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        return `${y}${m}${d}`;
+    }
+
+    let lastReportData = [];
+
+    async function generateReport() {
+        const entries = document.querySelectorAll('.tire-entry');
+        if (entries.length === 0) return;
+
+        const submitBtn = document.querySelector('.btn-submit');
+        submitBtn.innerText = '產生報告中...';
+        submitBtn.disabled = true;
+
+        const reportContainer = document.getElementById('report-container');
+        reportContainer.innerHTML = '';
+        lastReportData = [];
+
+        let cardIndex = 0;
+        for (const entryEl of entries) {
+            const id = entryEl.dataset.id;
+            const mainTitleText = entryEl.querySelector('.editable-title').innerText.trim();
+            const selectTypeText = entryEl.querySelector('.title-select').value;
+            const tireNumInput = entryEl.querySelector('.tire-number').value;
+            const fullHeader = buildLabel(mainTitleText, selectTypeText, tireNumInput);
+            const fileBaseName = buildLabel(mainTitleText, selectTypeText, tireNumInput) + '胎紋';
+
+            const checkTireNum = parseInt(tireNumInput, 10);
+            const yiWheelVal = entryEl.querySelector('.yi-wheel-select').value;
+            const currentImgUrl = getDiagramPath(selectTypeText, yiWheelVal, checkTireNum, mainTitleText);
+
+            // 上傳照片：並排置中，完整顯示不裁切（照片已存在 imgbb，直接使用網址）
+            const rawImages = entryImages[id] || [];
+
+            let photosHtml = `<div class="report-photos-row">`;
+            if (rawImages.length > 0) {
+                rawImages.forEach(urls => { photosHtml += `<img src="${urls.full}" crossOrigin="anonymous" loading="lazy">`; });
+            } else {
+                photosHtml += `<div class="report-photos-empty">（未上傳現場照片）</div>`;
+            }
+            photosHtml += `</div>`;
+
+            // 輪胎位置示意圖：置中顯示，放在上傳照片下方，並附上說明文字
+            const diagramHtml = currentImgUrl
+                ? `<div class="report-diagram-wrap"><img src="${currentImgUrl}" crossOrigin="anonymous"><div class="report-diagram-caption">▲此圖示意輪胎位置，非當事車輛輪胎</div></div>`
+                : '';
+
+            // 胎紋數據：只計入目前有顯示出來的列（預設4條，若有開啟第5條才會算入）
+            const visibleTreadRows = Array.from(entryEl.querySelectorAll('.tread-row')).filter(row => row.offsetParent !== null);
+            const labelSets = {
+                4: ['（外）', '（中外）', '（中內）', '（內）'],
+                5: ['（外）', '（中外）', '（中）', '（中內）', '（內）']
+            };
+            const treadLabels = labelSets[visibleTreadRows.length] || [];
+
+            let treadHtml = `<div class="report-tread-title">【胎紋量測：外 → 內】</div><div class="tread-list">`;
+            const treadItemsForExport = [];
+            visibleTreadRows.forEach((row, index) => {
+                const input = row.querySelector('.tread-val');
+                const val = input.value || ' — ';
+                const posLabel = treadLabels[index] || '';
+                treadHtml += `<div class="tread-item">◆第 ${index + 1} 條胎紋：<span class="val">${val}</span> ㎜${posLabel}</div>`;
+                treadItemsForExport.push({ label: `第 ${index + 1} 條胎紋`, val: val, pos: posLabel });
+            });
+            treadHtml += `</div>`;
+
+            // 記錄這一筆的原始資料，供「匯出HTML網頁檔」使用（存原始未壓縮照片，點擊放大時用）
+            lastReportData.push({
+                fullHeader,
+                mainTitleText,
+                selectTypeText,
+                tireNumInput,
+                rawImages,
+                diagramUrl: currentImgUrl,
+                treadItems: treadItemsForExport
+            });
+
+            cardIndex++;
+            const cardId = `report-node-${cardIndex}`;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'report-card-wrapper';
+            wrapper.innerHTML = `
+                <button type="button" class="btn-save-single" onclick="downloadCardAsImage('${cardId}', this, '${fileBaseName.replace(/'/g, "\\'")}')">[儲存] 這張圖片</button>
+                <div class="report-card" id="${cardId}">
+                    <div class="report-title">【${fullHeader}】</div>
+                    ${photosHtml}
+                    ${diagramHtml}
+                    ${treadHtml}
+                </div>`;
+            reportContainer.appendChild(wrapper);
+        }
+
+        document.getElementById('input-form-section').style.display = 'none';
+        document.getElementById('report-view-section').style.display = 'flex';
+        document.body.style.backgroundColor = '#555';
+        window.scrollTo(0, 0);
+
+        submitBtn.innerText = '送出資料';
+        submitBtn.disabled = false;
+    }
+
+    // 將同源示意圖轉成 base64，讓匯出的 HTML 檔案完全獨立、離線也能正常顯示
+    async function imgUrlToDataUrl(url) {
+        try {
+            const res = await fetch(url);
+            const blob = await res.blob();
+            return await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        } catch (e) {
+            return '';
+        }
+    }
+
+    // ---------- 匯出成獨立的 HTML 網頁檔（照片為縮圖，點擊後放大顯示） ----------
+    async function exportStandaloneHtml() {
+        if (!lastReportData.length) return;
+        const btn = document.querySelector('.btn-export-html');
+        const originalText = btn.innerText;
+        btn.innerText = '產生中...';
+        btn.disabled = true;
+
+        try {
+            let cardsHtml = '';
+            for (const entry of lastReportData) {
+                let photosHtml = '';
+                if (entry.rawImages.length > 0) {
+                    entry.rawImages.forEach((urls) => {
+                        photosHtml += `<img class="thumb" src="${urls.thumb}" data-full="${urls.full}" loading="lazy" onclick="openLightbox(this.dataset.full)">`;
+                    });
+                } else {
+                    photosHtml = '<div class="empty-note">（未上傳現場照片）</div>';
+                }
+
+                let diagramHtml = '';
+                if (entry.diagramUrl) {
+                    const diagramDataUrl = await imgUrlToDataUrl(entry.diagramUrl);
+                    if (diagramDataUrl) {
+                        diagramHtml = `<div class="diagram-wrap"><img src="${diagramDataUrl}"><div class="diagram-caption">▲此圖示意輪胎位置，非當事車輛輪胎</div></div>`;
+                    }
+                }
+
+                let treadHtml = '<div class="tread-title">【胎紋量測：外 → 內】</div><div class="tread-list">';
+                entry.treadItems.forEach((t) => {
+                    treadHtml += `<div class="tread-item">◆${t.label}：<span class="val">${t.val}</span> ㎜${t.pos}</div>`;
+                });
+                treadHtml += '</div>';
+
+                cardsHtml += `
+                <div class="card">
+                    <div class="card-title">【${entry.fullHeader}】</div>
+                    <div class="photos-row">${photosHtml}</div>
+                    ${diagramHtml}
+                    ${treadHtml}
+                </div>`;
+            }
+
+            const fullHtml = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>輪胎檢查報告</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;background:#555;margin:0;padding:20px 10px;}
+  .card{background:#fff;max-width:460px;margin:0 auto 24px;padding:22px 18px;border-radius:16px;box-sizing:border-box;}
+  .card-title{font-size:26px;font-weight:bold;text-align:center;border-bottom:3px solid #333;padding-bottom:14px;margin-bottom:18px;}
+  .photos-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .thumb{width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid #ddd;background:#fafafa;cursor:zoom-in;flex-shrink:0;}
+  .empty-note{color:#aaa;font-size:16px;padding:14px;text-align:center;width:100%;}
+  .diagram-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;}
+  .diagram-wrap img{max-width:85%;height:auto;border:1px solid #ddd;border-radius:8px;background:#fff;}
+  .diagram-caption{margin-top:8px;font-size:15px;color:#d32f2f;font-weight:bold;text-align:center;}
+  .tread-title{font-size:20px;font-weight:bold;margin-bottom:12px;text-align:center;}
+  .tread-list{width:fit-content;max-width:100%;margin:0 auto;}
+  .tread-item{margin-bottom:10px;padding:14px 16px;background:#f9f9f9;border-radius:8px;border-left:6px solid #007bff;font-size:18px;font-weight:bold;text-align:left;}
+  .tread-item .val{color:#007bff;font-size:19px;}
+  #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;cursor:zoom-out;}
+  #lightbox img{max-width:100%;max-height:100%;}
+</style>
+</head>
+<body>
+${cardsHtml}
+<div id="lightbox" onclick="this.style.display='none';"><img id="lightbox-img" src=""></div>
+<script>
+function openLightbox(src){
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').style.display = 'flex';
+}
+<\/script>
+</body>
+</html>`;
+
+            const dateStr = getDateStr();
+            const nameLabels = lastReportData.map(entry =>
+                buildFileNameLabel(entry.mainTitleText, entry.selectTypeText, entry.tireNumInput)
+            );
+            const nameCore = nameLabels.join('、');
+            const fileName = `${nameCore}-胎紋檢查_${dateStr}.html`;
+
+            const blob = new Blob([fullHtml], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (err) {
+            alert('產生網頁檔失敗：' + (err && err.message ? err.message : err));
+        }
+
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+
+    // ---------- 單張報告卡片存成圖檔（手機優先用系統分享／儲存到相簿） ----------
+
+    async function downloadCardAsImage(cardId, btn, filename) {
+        const node = document.getElementById(cardId);
+        const originalText = btn.innerText;
+        btn.innerText = '正在產生圖檔...';
+        btn.disabled = true;
+
+        try {
+            const canvas = await html2canvas(node, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#ffffff"
+            });
+
+            // 先測試畫布是否因外部圖片（示意圖）而被瀏覽器判定「受污染」，
+            // 受污染的畫布無法匯出成圖檔，這裡先偵測出來，給使用者明確原因
+            try {
+                canvas.toDataURL();
+            } catch (taintErr) {
+                alert('這張報告裡的「輪胎位置示意圖」是外部連結的圖片，瀏覽器基於安全限制無法把它存成圖檔。\n\n暫時的解決方式：請直接用手機/電腦的「截圖」功能保存這張報告；我們也可以把示意圖改成內建圖檔來徹底解決這個問題，跟我說一聲即可。');
+                btn.innerText = originalText;
+                btn.disabled = false;
+                return;
+            }
+
+            canvas.toBlob(async (blob) => {
+                if (!blob) {
+                    alert('圖檔產生失敗，請重試。');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                const file = new File([blob], `${filename}.png`, { type: 'image/png' });
+
+                // 手機優先走系統「分享」功能，可直接存到相簿，比下載連結可靠許多
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({ files: [file], title: filename });
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        return;
+                    } catch (shareErr) {
+                        // 使用者取消分享視窗，不算失敗，往下走備用下載方式
+                    }
+                }
+
+                // 備用方式：一般下載連結（電腦、部分手機瀏覽器適用）
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `${filename}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }, 'image/png');
+        } catch (err) {
+            alert('圖檔產生失敗：' + (err && err.message ? err.message : err) + '\n\n請重試，或改用手機截圖方式保存。');
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // 頁面載入時，先建立第一筆輪胎資料輸入區
+    addEntry();
+</script>
+</body>
+</html>
