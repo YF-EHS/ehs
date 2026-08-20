@@ -718,39 +718,39 @@
     // ---------- 產生報告（每一筆各自一張獨立卡片，直向堆疊排版，適合手機瀏覽） ----------
 
     const TIRE_IMG_MAP = {
-        1: "wheel-1/8-1.jpg",
-        2: "wheel-1/8-2.jpg",
-        3: "wheel-1/8-3.jpg",
-        4: "wheel-1/8-4.jpg",
-        5: "wheel-1/8-5.jpg",
-        6: "wheel-1/8-6.jpg",
-        7: "wheel-1/8-7.jpg",
-        8: "wheel-1/8-8.jpg"
+        1: "wheel/8-1.jpg",
+        2: "wheel/8-2.jpg",
+        3: "wheel/8-3.jpg",
+        4: "wheel/8-4.jpg",
+        5: "wheel/8-5.jpg",
+        6: "wheel/8-6.jpg",
+        7: "wheel/8-7.jpg",
+        8: "wheel/8-8.jpg"
     };
 
     // 「板」「櫃」改用新的示意圖
     const FT_IMG_MAP = {
-        1: "wheel-1/ft-1.jpg",
-        2: "wheel-1/ft-2.jpg",
-        3: "wheel-1/ft-3.jpg",
-        4: "wheel-1/ft-4.jpg",
-        5: "wheel-1/ft-5.jpg",
-        6: "wheel-1/ft-6.jpg",
-        7: "wheel-1/ft-7.jpg",
-        8: "wheel-1/ft-8.jpg"
+        1: "wheel/ft-1.jpg",
+        2: "wheel/ft-2.jpg",
+        3: "wheel/ft-3.jpg",
+        4: "wheel/ft-4.jpg",
+        5: "wheel/ft-5.jpg",
+        6: "wheel/ft-6.jpg",
+        7: "wheel/ft-7.jpg",
+        8: "wheel/ft-8.jpg"
     };
 
     // 「板」當中的 3、7、8、11、17 號屬於「鷗」字特殊板台，車牌前要加「鷗-」，示意圖也改用 gw 系列
     const GULL_BOARD_NUMBERS = ['3', '7', '8', '11', '17'];
     const GW_IMG_MAP = {
-        1: "wheel-1/gw-1.jpg",
-        2: "wheel-1/gw-2.jpg",
-        3: "wheel-1/gw-3.jpg",
-        4: "wheel-1/gw-4.jpg",
-        5: "wheel-1/gw-5.jpg",
-        6: "wheel-1/gw-6.jpg",
-        7: "wheel-1/gw-7.jpg",
-        8: "wheel-1/gw-8.jpg"
+        1: "wheel/gw-1.jpg",
+        2: "wheel/gw-2.jpg",
+        3: "wheel/gw-3.jpg",
+        4: "wheel/gw-4.jpg",
+        5: "wheel/gw-5.jpg",
+        6: "wheel/gw-6.jpg",
+        7: "wheel/gw-7.jpg",
+        8: "wheel/gw-8.jpg"
     };
     function isGullBoard(selectTypeText, mainTitleText) {
         return selectTypeText === '板' && GULL_BOARD_NUMBERS.includes(String(mainTitleText).trim());
@@ -758,22 +758,22 @@
 
     // 「曳」車型另外依 6輪／8輪 對應不同示意圖
     const YI_IMG_MAP_8 = {
-        1: "wheel-1/truck-8-1.png",
-        2: "wheel-1/truck-8-2.png",
-        3: "wheel-1/truck-8-3.png",
-        4: "wheel-1/truck-8-4.png",
-        5: "wheel-1/truck-8-5.png",
-        6: "wheel-1/truck-8-6.png",
-        7: "wheel-1/truck-8-7.png",
-        8: "wheel-1/truck-8-8.png"
+        1: "wheel/truck-8-1.png",
+        2: "wheel/truck-8-2.png",
+        3: "wheel/truck-8-3.png",
+        4: "wheel/truck-8-4.png",
+        5: "wheel/truck-8-5.png",
+        6: "wheel/truck-8-6.png",
+        7: "wheel/truck-8-7.png",
+        8: "wheel/truck-8-8.png"
     };
     const YI_IMG_MAP_6 = {
-        1: "wheel-1/truck-8-1.png",
-        2: "wheel-1/truck-8-2.png",
-        3: "wheel-1/truck-8-3.png",
-        4: "wheel-1/truck-6-4.png",
-        5: "wheel-1/truck-6-5.png",
-        6: "wheel-1/truck-6-6.png"
+        1: "wheel/truck-8-1.png",
+        2: "wheel/truck-8-2.png",
+        3: "wheel/truck-8-3.png",
+        4: "wheel/truck-6-4.png",
+        5: "wheel/truck-6-5.png",
+        6: "wheel/truck-6-6.png"
     };
 
     function getDiagramPath(typeText, yiWheelVal, tireNum, mainTitleText) {
